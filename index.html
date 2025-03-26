@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бургер-мастер</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>🍔 Собери Сырный Джо 🍔</h1>
+        <div class="score">Очки: <span id="score">0</span></div>
+        <button id="sound-btn">🔊 Звук Вкл</button>
+        
+        <div class="order-container">
+            <h2>Рецепт:</h2>
+            <div id="order-description">Соберите бургер в правильном порядке</div>
+        </div>
+        
+        <div class="game-area">
+            <div class="burger-area">
+                <h3>Ваш бургер: <button id="clear-btn">Очистить</button></h3>
+                <div id="burger-text"></div>
+            </div>
+            
+            <div class="ingredients-area">
+                <h3>Ингредиенты:</h3>
+                <div id="ingredients-list" class="ingredients-grid"></div>
+            </div>
+        </div>
+        
+        <button id="submit-btn">Проверить бургер</button>
+        <div id="message"></div>
+    </div>
+
+    <!-- Звуковые элементы -->
+    <audio id="add-sound" src="sounds/add-ingredient.mp3" preload="auto"></audio>
+    <audio id="success-sound" src="sounds/success.mp3" preload="auto"></audio>
+    <audio id="error-sound" src="sounds/error.mp3" preload="auto"></audio>
+    <audio id="complete-sound" src="sounds/complete.mp3" preload="auto"></audio>
+    
+    <script src="game.js"></script>
+</body>
+</html>
