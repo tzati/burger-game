@@ -31,6 +31,8 @@ const recipe = {
 let playerBurger = [];
 let score = 0;
 let soundEnabled = true;
+let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+let activeIngredient = null;
 
 function initGame() {
     playerBurger = [];
@@ -39,9 +41,51 @@ function initGame() {
     
     document.getElementById('clear-btn').addEventListener('click', clearBurger);
     document.getElementById('submit-btn').addEventListener('click', checkBurger);
-    
-    // Кнопка звука
     document.getElementById('sound-btn').addEventListener('click', toggleSound);
+    
+    // Настройка зоны сброса
+    const dropzone = document.getElementById('burger-text');
+    dropzone.addEventListener('dragover', dragOver);
+    dropzone.addEventListener('drop', drop);
+    
+    if (isMobile) {
+        setupMobileEvents();
+    }
+}
+
+function setupMobileEvents() {
+    const ingredients = document.querySelectorAll('.ingredient-item');
+    const dropzone = document.getElementById('burger-text');
+    
+    ingredients.forEach(item => {
+        item.addEventListener('touchstart', handleTouchStart, { passive: false });
+        item.addEventListener('touchend', handleTouchEnd, { passive: false });
+    });
+    
+    dropzone.addEventListener('touchend', handleDrop);
+}
+
+function handleTouchStart(e) {
+    e.preventDefault();
+    activeIngredient = e.target.closest('.ingredient-item');
+    activeIngredient.style.opacity = '0.7';
+}
+
+function handleTouchEnd(e) {
+    e.preventDefault();
+    if (activeIngredient) {
+        activeIngredient.style.opacity = '1';
+    }
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    if (activeIngredient) {
+        const ingredient = activeIngredient.querySelector('.ingredient-name').textContent;
+        addIngredientToBurger(ingredient);
+        activeIngredient.style.opacity = '1';
+        activeIngredient = null;
+    }
 }
 
 function setupIngredients() {
@@ -54,8 +98,11 @@ function setupIngredients() {
     shuffledIngredients.forEach(ing => {
         const item = document.createElement('div');
         item.className = 'ingredient-item';
-        item.draggable = true;
-        item.addEventListener('dragstart', dragStart);
+        item.draggable = !isMobile;
+        
+        if (!isMobile) {
+            item.addEventListener('dragstart', dragStart);
+        }
         
         const img = document.createElement('img');
         img.src = recipe.images[ing];
@@ -70,16 +117,10 @@ function setupIngredients() {
         item.appendChild(name);
         ingredientsList.appendChild(item);
     });
-    
-    // Настройка области для бургера
-    const burgerText = document.getElementById('burger-text');
-    burgerText.addEventListener('dragover', dragOver);
-    burgerText.addEventListener('drop', drop);
 }
 
 function dragStart(e) {
-    const ingredient = e.target.closest('.ingredient-item').querySelector('.ingredient-name').textContent;
-    e.dataTransfer.setData('text/plain', ingredient);
+    e.dataTransfer.setData('text/plain', e.target.querySelector('.ingredient-name').textContent);
 }
 
 function dragOver(e) {
@@ -88,7 +129,10 @@ function dragOver(e) {
 
 function drop(e) {
     e.preventDefault();
-    const ingredient = e.dataTransfer.getData('text/plain');
+    const ingredient = isMobile ? 
+        activeIngredient.querySelector('.ingredient-name').textContent :
+        e.dataTransfer.getData('text/plain');
+    
     addIngredientToBurger(ingredient);
 }
 
